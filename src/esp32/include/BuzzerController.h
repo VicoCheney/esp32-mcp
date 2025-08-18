@@ -5,7 +5,6 @@
 #include "ConfigLoader.h"
 #include "TopicHandlerRegistry.h"
 
-
 class BuzzerController : public TopicHandler
 {
 public:
@@ -14,18 +13,7 @@ public:
     const char *getTopic() const override;
 
 private:
-    // 基础控制方法
-    void _turnOn();
-    void _turnOff();
+    void _turnOnBuzzer();
+    void _turnOffBuzzer();
     void _beep(int duration);
-
-    // 高级非阻塞播放
-    void _playSong(JsonArray score, int tempo = 120);
-    static void _songTask(void* param);
-
-    // 播放状态
-    bool _isPlaying = false;
-    JsonArray _currentScore;
-    int _currentNoteIndex = 0;
-    int _tempo = 120;
 };

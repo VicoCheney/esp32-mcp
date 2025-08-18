@@ -43,15 +43,25 @@ void loop()
     // Handle OTA update requests
     OTAHandler::handle();
 
+    // Check WiFi connection first
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        WiFiManager::reconnectIfNeeded();
+        delay(1000);
+        return;
+    }
+
     // Ensure MQTT connection
     if (!MQTTClient::getMQTTClient().connected())
     {
         MQTTClient::connectToMQTT();
+        delay(5000); // Wait before retry
+        return;
     }
 
     // Keep MQTT client running
     MQTTClient::loop();
 
-    // Optional: handle WiFi auto-reconnect
-    WiFiManager::reconnectIfNeeded();
+    // Small delay to prevent watchdog reset
+    delay(10);
 }

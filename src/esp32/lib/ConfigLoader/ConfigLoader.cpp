@@ -6,7 +6,8 @@ bool ConfigLoader::loadConfig(const char *filename)
 {
     // remount LittleFS to ensure we can read the config file
     LittleFS.end();
-    if (!LittleFS.begin(false)) {  // false = do not format
+    if (!LittleFS.begin(false))
+    { // false = do not format
         Serial.println("❌ Failed to mount LittleFS");
         return false;
     }
@@ -54,6 +55,36 @@ bool ConfigLoader::loadConfig(const char *filename)
     // ====== Buzzer ======
     config.buzzer_pin = doc["esp32"]["buzzer"]["pin"] | -1;
     config.buzzer_control_topic = doc["emqx"]["topic"]["buzzer_control"] | "esp32-mcp/control/buzzer";
+
+    // ====== Validation ======
+    bool configValid = true;
+
+    if (config.wifi_ssid.isEmpty())
+    {
+        Serial.println("❌ WiFi SSID is required");
+        configValid = false;
+    }
+
+    if (config.mqtt_broker.isEmpty())
+    {
+        Serial.println("❌ MQTT broker is required");
+        configValid = false;
+    }
+
+    if (config.led_pin < 0)
+    {
+        Serial.println("⚠️ LED pin not configured");
+    }
+
+    if (config.buzzer_pin < 0)
+    {
+        Serial.println("⚠️ Buzzer pin not configured");
+    }
+
+    if (!configValid)
+    {
+        return false;
+    }
 
     // ====== Print ======
     Serial.println("✅ Config loaded:");

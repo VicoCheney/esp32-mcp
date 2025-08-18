@@ -60,26 +60,73 @@ void MQTTClient::connectToMQTT()
     if (mqttClient.connected())
         return;
 
-    Serial.print("Attempting MQTT connection...");
+    if (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.println("❌ WiFi not connected, cannot connect to MQTT");
+        return;
+    }
+
+    Serial.print("🔗 Attempting MQTT connection...");
     String client_id = "esp32-client-" + String(WiFi.macAddress());
 
     const auto &cfg = ConfigLoader::getConfig();
     if (mqttClient.connect(client_id.c_str(), cfg.mqtt_username.c_str(), cfg.mqtt_password.c_str()))
     {
-        Serial.println("connected");
+        Serial.println(" ✅ connected");
 
         // Subscribe to all registered topic handlers
         const auto &handlers = TopicHandlerRegistry::getAllHandlers();
+        Serial.printf("📡 Subscribing to %d topics:\n", handlers.size());
         for (auto h : handlers)
         {
-            mqttClient.subscribe(h->getTopic());
-            Serial.printf("Subscribed to topic: %s\n", h->getTopic());
+            if (mqttClient.subscribe(h->getTopic()))
+            {
+                Serial.printf("  ✅ %s\n", h->getTopic());
+            }
+            else
+            {
+                Serial.printf("  ❌ Failed to subscribe to %s\n", h->getTopic());
+            }
         }
     }
     else
     {
-        Serial.print("Connection failed, rc=");
+        Serial.print(" ❌ failed, rc=");
         Serial.print(mqttClient.state());
-        Serial.println(" — will retry in 5 seconds");
+
+        // explain the error code
+        switch (mqttClient.state())
+        {
+        case -4:
+            Serial.println(" (Connection timeout)");
+            break;
+        case -3:
+            Serial.println(" (Connection lost)");
+            break;
+        case -2:
+            Serial.println(" (Connect failed)");
+            break;
+        case -1:
+            Serial.println(" (Disconnected)");
+            break;
+        case 1:
+            Serial.println(" (Bad protocol)");
+            break;
+        case 2:
+            Serial.println(" (Bad client ID)");
+            break;
+        case 3:
+            Serial.println(" (Unavailable)");
+            break;
+        case 4:
+            Serial.println(" (Bad credentials)");
+            break;
+        case 5:
+            Serial.println(" (Unauthorized)");
+            break;
+        default:
+            Serial.println(" (Unknown error)");
+            break;
+        }
     }
 }

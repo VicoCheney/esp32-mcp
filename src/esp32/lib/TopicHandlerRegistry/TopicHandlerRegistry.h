@@ -39,4 +39,4 @@ private:
                 std::unique_ptr<TopicHandler>(new cls())); \
         }                                                  \
     };                                                     \
-    __attribute__((used)) static cls##AutoRegister global_##cls##AutoRegister;
+    static cls##AutoRegister global_##cls##AutoRegister;

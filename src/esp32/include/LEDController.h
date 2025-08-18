@@ -13,7 +13,7 @@ public:
     const char *getTopic() const override;
 
 private:
-    void turnOnLED();
-    void turnOffLED();
-    void setBrightness(int brightness);
+    void _turnOnLED();
+    void _turnOffLED();
+    void _setBrightness(int brightness);
 };

@@ -11,7 +11,7 @@
 class MQTTClient
 {
 public:
-    /** 
+    /**
      * MQTT callback function called when a message arrives
      * @param topic MQTT topic of the message
      * @param payload Pointer to the message payload

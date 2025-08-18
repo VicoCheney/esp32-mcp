@@ -1,4 +1,5 @@
 #include "TopicHandlerRegistry.h"
+#include <cstring>
 
 std::vector<std::unique_ptr<TopicHandler>> TopicHandlerRegistry::handlers;
 
@@ -9,9 +10,14 @@ void TopicHandlerRegistry::registerHandler(std::unique_ptr<TopicHandler> handler
 
 TopicHandler *TopicHandlerRegistry::getHandlerForTopic(const char *topic)
 {
+    if (!topic)
+    {
+        return nullptr;
+    }
+
     for (auto &handler : handlers)
     {
-        if (topic == handler->getTopic())
+        if (strcmp(topic, handler->getTopic()) == 0)
         {
             return handler.get();
         }
