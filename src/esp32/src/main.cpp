@@ -11,7 +11,8 @@ void setup()
     Serial.begin(115200);
 
     // Initialize LittleFS
-    if (!LittleFS.begin()) {
+    if (!LittleFS.begin())
+    {
         Serial.println("⚠️ Failed to initialize LittleFS");
     }
 
